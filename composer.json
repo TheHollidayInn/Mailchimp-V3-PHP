@@ -16,8 +16,8 @@
         "vlucas/phpdotenv": "^2.2"
     },
     "autoload": {
-        "psr-0": {
-            "Mailchimp": "src/"
+        "psr-4": {
+            "Mailchimp\\": "src/"
         }
     }
 }

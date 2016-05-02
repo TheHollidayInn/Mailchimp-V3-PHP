@@ -1,4 +1,6 @@
 <?php
+namespace Mailchimp;
+
 class Mailchimp
 {
   private $dc;
