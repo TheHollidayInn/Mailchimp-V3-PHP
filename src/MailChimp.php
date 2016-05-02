@@ -19,7 +19,7 @@ class Mailchimp
 
     if (!empty($data) && $method == "GET") {
       $getData = http_build_query($data);
-      $this->url .= "?$getData";
+      $url .= "?$getData";
     }
 
     $ch = curl_init($url);
