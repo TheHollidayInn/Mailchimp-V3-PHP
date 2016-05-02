@@ -1,17 +1,18 @@
 <?php
-
-class MailChimpWrapper
+class Mailchimp
 {
-  public $dc = "us5";
-	public $key = "";
-	private $urlPrefix = 'https://us5';
-	private $apiLink = '.api.mailchimp.com/3.0';
+  private $dc;
+	private $key;
+	private $urlProtocol = 'https://';
+	private $apiEndPoint = '.api.mailchimp.com/3.0';
+
 	private $url;
 	private $data;
 
-  public function __construct()
+  public function __construct($key, $dc)
   {
-
+    $this->key = $key;
+    $this->dc = $dc;
   }
 
 	private function mcCurl($post = "GET") {
