@@ -1,0 +1,18 @@
+{
+    "name": "thehollidayinn/mailchimp",
+    "type": "library",
+    "version": "1.0.0",
+    "description": "API client library for the MailChimp v3 bulk email as a service platform",
+    "keywords": ["email", "api"],
+    "homepage": "",
+    "license": "MIT",
+    "authors": [{"name": "Keith Holliday", "email": "keithrholliday@gmail.com", "homepage": "http://Hollidaykeith.com", "role": "Developer"}],
+    "require": {
+        "php": ">=5.2.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "Mailchimp": "src/"
+        }
+    }
+}
