@@ -16,7 +16,7 @@ class Mailchimp
 
 	private function sendRequest($endPoint, $data = array(), $method = "GET")
   {
-    $url = $this->curlProtocol . $this->dc . $this->apiURL . $endPoint;
+    $url = $this->urlProtocol . $this->dc . $this->apiURL . $endPoint;
     $dataEncoded = json_encode($data);
 
     if (!empty($data) && $method == "GET") {
