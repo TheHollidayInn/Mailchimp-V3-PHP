@@ -4,10 +4,7 @@ class Mailchimp
   private $dc;
 	private $key;
 	private $urlProtocol = 'https://';
-	private $apiEndPoint = '.api.mailchimp.com/3.0';
-
-	private $url;
-	private $data;
+	private $apiURL = '.api.mailchimp.com/3.0';
 
   public function __construct($key, $dc)
   {
@@ -15,33 +12,24 @@ class Mailchimp
     $this->dc = $dc;
   }
 
-	private function mcCurl($post = "GET") {
+	private function sendRequest($endPoint, $data = array(), $method = "GET")
+  {
+    $url = $this->curlProtocol . $this->dc . $this->apiURL . $endPoint;
+    $dataEncoded = json_encode($data);
 
-		$data = json_encode($this->data);
-
-    $method = "GET";
-
-    if ($post == "PUT") {
-      $method = "PUT";
-    } else if ($post == "PATCH") {
-      $method = "PATCH";
-    } else if ($post == 1 || $post == "POST") {
-      $method = "POST";
-    } else {
-      if (isset($this->data)) {
-        $getData = http_build_query($this->data);
-        $this->url .= "?$getData";
-      }
+    if (!empty($data) && $method == "GET") {
+      $getData = http_build_query($data);
+      $this->url .= "?$getData";
     }
 
-    $ch = curl_init($this->url);
+    $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_USERPWD, 'user:' . $this->key);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $dataEncoded);
 
     $result = curl_exec($ch);
 
@@ -74,7 +62,7 @@ class Mailchimp
     $this->data = $data;
     $this->url = $this->urlPrefix.$this->apiLink.'/lists';
 
-    return $this->mcCurl("POST");
+    return $this->sendRequest("POST");
   }
 
 	public function getLists($offset = 0, $limit = 25)
@@ -84,10 +72,7 @@ class Mailchimp
 			"count" => $limit,
 		);
 
-		$this->data = $data;
-		$this->url = $this->urlPrefix.$this->apiLink.'/lists';
-
-		return $this->mcCurl();
+		return $this->sendRequest('/lists', $data);
 	}
 
   public function getListActivty($listId, $count = 10)
@@ -99,7 +84,7 @@ class Mailchimp
 		$this->data = $data;
 		$this->url = $this->urlPrefix.$this->apiLink."/lists/$listId/activity";
 
-		return $this->mcCurl();
+		return $this->sendRequest();
 	}
 
   public function getListGrowthHistory($listId, $limit = 100)
@@ -112,7 +97,7 @@ class Mailchimp
 
 		$this->url = $this->urlPrefix.$this->apiLink."/lists/$listId/growth-history";
 
-		return $this->mcCurl();
+		return $this->sendRequest();
 	}
 
   public function getListClients($listId)
@@ -122,7 +107,7 @@ class Mailchimp
 
 		$this->url = $this->urlPrefix.$this->apiLink."/lists/$listId/clients";
 
-		return $this->mcCurl("GET");
+		return $this->sendRequest("GET");
 	}
 
   //Campaigns
@@ -131,7 +116,7 @@ class Mailchimp
     $this->data = array();
     $this->url = $this->urlPrefix.$this->apiLink.'/campaign-folders';
 
-    return $this->mcCurl();
+    return $this->sendRequest();
   }
 
 	public function getCampaignLists($list_id, $limit = 25, $startDate = "2015-06-01 00:00:00", $endDate = "2015-10-31 00:00:00")
@@ -153,7 +138,7 @@ class Mailchimp
 		$this->data = $data;
 		$this->url = $this->urlPrefix.$this->apiLink.'/campaigns';
 
-		return $this->mcCurl();
+		return $this->sendRequest();
 	}
 
   public function createTemplate($name, $html)
@@ -167,7 +152,7 @@ class Mailchimp
 		$this->data = $data;
 		$this->url = $this->urlPrefix.$this->apiLink.'/templates';
 
-		return $this->mcCurl(1);
+		return $this->sendRequest(1);
 	}
 
   public function createCampaign($campaign, $email, $text)
@@ -177,7 +162,7 @@ class Mailchimp
 		$this->data = $campaign;
 		$this->url = $this->urlPrefix.$this->apiLink.'/campaigns';
 
-		return $this->mcCurl(1);
+		return $this->sendRequest(1);
 	}
 
   public function putCampaignContent($campaignId, $html, $text)
@@ -190,7 +175,7 @@ class Mailchimp
 		$this->data = $data;
 		$this->url = $this->urlPrefix.$this->apiLink."/campaigns/$campaignId/content";
 
-		return $this->mcCurl("PUT");
+		return $this->sendRequest("PUT");
 	}
 
   public function sendCampaign($campaign)
@@ -198,7 +183,7 @@ class Mailchimp
     $this->data = array();
 		$this->url = $this->urlPrefix.$this->apiLink."/campaigns/$campaign->id/actions/send";
 
-		return $this->mcCurl("POST");
+		return $this->sendRequest("POST");
 	}
 
 	public function getMemberActivity($list_id, $emails = array())
@@ -210,7 +195,7 @@ class Mailchimp
 		$this->data = $data;
 		$this->url = $this->urlPrefix.$this->apiLink. "/lists/$list_id/activity";
 
-		return $this->mcCurl("GET");
+		return $this->sendRequest("GET");
 	}
 
   public function getListMembers($list_id, $count = 10)
@@ -222,21 +207,21 @@ class Mailchimp
     $this->data = $data;
 		$this->url = $this->urlPrefix.$this->apiLink. "/lists/$list_id/members";
 
-		return $this->mcCurl("GET");
+		return $this->sendRequest("GET");
   }
 
   public function getListMemberActivity($list_id, $subscriber_hash)
   {
     $this->url = $this->urlPrefix.$this->apiLink. "/lists/$list_id/members/$subscriber_hash/activity";
 
-		return $this->mcCurl("GET");
+		return $this->sendRequest("GET");
   }
 
   public function getBatches()
   {
 		$this->url = $this->urlPrefix.$this->apiLink.'/batches';
 
-		return $this->mcCurl();
+		return $this->sendRequest();
   }
 
 	public function batchSubscribe($list_id, $emails)
@@ -258,7 +243,7 @@ class Mailchimp
 		$this->data = $data;
 		$this->url = $this->urlPrefix.$this->apiLink.'/batches';
 
-		return $this->mcCurl(1);
+		return $this->sendRequest(1);
 	}
 
   public function batchUnSubscribe($list_id, $emails, $delete_member = false)
@@ -274,7 +259,7 @@ class Mailchimp
 		$this->data = $data;
 		$this->url = $this->urlPrefix.$this->apiLink.'/lists/batch-unsubscribe';
 
-		return $this->mcCurl(1);
+		return $this->sendRequest(1);
 	}
 
 	//Reports
@@ -289,14 +274,14 @@ class Mailchimp
 		$this->data = $data;
 		$this->url = $this->urlPrefix.$this->apiLink.'/reports/unsubscribes';
 
-		return $this->mcCurl();
+		return $this->sendRequest();
 	}
 
 	public function getCampaignReport($campaign_id)
   {
 		$this->url = $this->urlPrefix.$this->apiLink."/reports/$campaign_id";
 
-		return $this->mcCurl();
+		return $this->sendRequest();
 	}
 
   //Export API
@@ -349,7 +334,7 @@ class Mailchimp
 		$this->data = $data;
 		$this->url = $this->urlPrefix.$this->apiLink."/lists/$listId/members";
 
-		return $this->mcCurl(1);
+		return $this->sendRequest(1);
 	}
 
 }

@@ -2,8 +2,11 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-define("API_KEY", "Your api key");
-define("DC", "Your dc");
+$dotenv = new Dotenv\Dotenv(__DIR__ . '/..');
+$dotenv->load();
+
+define("API_KEY", getenv('API_KEY'));
+define("DC", getenv('DC'));
 
 $MC = new Mailchimp(API_KEY, DC);
 $lists = $MC->getLists();
