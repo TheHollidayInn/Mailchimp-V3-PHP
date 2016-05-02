@@ -1,5 +1,5 @@
 {
-    "name": "thehollidayinn/mailchimp",
+    "name": "thehollidayinn/mailchimp-php-v3",
     "type": "library",
     "version": "1.0.0",
     "description": "API client library for the MailChimp v3 bulk email as a service platform",
