@@ -123,24 +123,17 @@ class Mailchimp
 
 	public function getCampaignLists($list_id, $limit = 25, $startDate = "2015-06-01 00:00:00", $endDate = "2015-10-31 00:00:00")
   {
-
-    $startDate = new DateTime($startDate);
-    $startDate->format(DateTime::ISO8601);
-
-    $endDate = new DateTime($endDate);
-    $endDate->format(DateTime::ISO8601);
+    $startDate = new \DateTime($startDate);
+    $endDate = new \DateTime($endDate);
 
     $data = array(
       "list_id" => $list_id,// @TODO: How do we filter by list?
-			"since_create_time" => $startDate->format(DateTime::ISO8601),
-			"before_create_time" => $endDate->format(DateTime::ISO8601),
+			"since_create_time" => $startDate->format(\DateTime::ISO8601),
+			"before_create_time" => $endDate->format(\DateTime::ISO8601),
 			"count" => $limit,
 		);
 
-		$this->data = $data;
-		$this->url = $this->urlPrefix.$this->apiLink.'/campaigns';
-
-		return $this->sendRequest();
+		return $this->sendRequest('/campaigns', $data, "GET");
 	}
 
   public function createTemplate($name, $html)
@@ -157,14 +150,10 @@ class Mailchimp
 		return $this->sendRequest(1);
 	}
 
-  public function createCampaign($campaign, $email, $text)
+  public function createCampaign($campaign)
   {
-    $campaign["type"] = "regular";
-
-		$this->data = $campaign;
-		$this->url = $this->urlPrefix.$this->apiLink.'/campaigns';
-
-		return $this->sendRequest(1);
+    $campaign->type = "regular";
+    return $this->sendRequest('/campaigns', $campaign, "POST");
 	}
 
   public function putCampaignContent($campaignId, $html, $text)
@@ -173,19 +162,13 @@ class Mailchimp
 			"html" => $html,
       "plain_text" => $text,
 		);
-
-		$this->data = $data;
-		$this->url = $this->urlPrefix.$this->apiLink."/campaigns/$campaignId/content";
-
-		return $this->sendRequest("PUT");
+		return $this->sendRequest("/campaigns/$campaignId/content", $data, "PUT");
 	}
 
   public function sendCampaign($campaign)
   {
-    $this->data = array();
-		$this->url = $this->urlPrefix.$this->apiLink."/campaigns/$campaign->id/actions/send";
-
-		return $this->sendRequest("POST");
+    $data = array();
+    return $this->sendRequest("/campaigns/$campaign->id/actions/send", $data, "POST");
 	}
 
 	public function getMemberActivity($list_id, $emails = array())
@@ -310,7 +293,7 @@ class Mailchimp
   {
   	//Get MC users for rr_mailchimp_settings
   	$mc_api_url = 'http://us5.api.mailchimp.com/export/1.0/campaignSubscriberActivity/';
-    $mc_api_url .= '?apikey=264fd6ce3af9715e32d9f0ac0d421e58-us5&id='.$campaignId;
+    $mc_api_url .= '?apikey=' . $this->key . '&id='.$campaignId;
 
   	$ch = curl_init();
 
